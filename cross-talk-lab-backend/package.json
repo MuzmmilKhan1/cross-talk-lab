@@ -1,0 +1,31 @@
+{
+  "scripts": {
+    "test": "node --enable-source-maps dest/test",
+    "start": "node --enable-source-maps dest",
+    "dev": "tsc-watch --onSuccess \"node --enable-source-maps dest\"",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "faiss-node": "^0.5.1",
+    "formidable": "^3.5.1",
+    "jsdom": "^24.0.0",
+    "langchain": "^0.1.30",
+    "mammoth": "^1.7.1",
+    "pdf-parse": "^1.1.1",
+    "pickleparser": "^0.2.1",
+    "sqlite3": "^5.1.7",
+    "typeorm": "^0.3.20",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/formidable": "^3.4.5",
+    "@types/jsdom": "^21.1.6",
+    "@types/pdf-parse": "^1.1.4",
+    "tsc-watch": "^6.2.0"
+  }
+}
