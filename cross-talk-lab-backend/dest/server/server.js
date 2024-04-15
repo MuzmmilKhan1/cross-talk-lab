@@ -9,7 +9,7 @@ const cors_1 = __importDefault(require("cors"));
 class Server {
     PORT;
     app;
-    constructor(PORT = 8080) {
+    constructor(PORT = 80) {
         this.PORT = PORT;
         this.app = (0, express_1.default)();
         this.useMiddlewires();

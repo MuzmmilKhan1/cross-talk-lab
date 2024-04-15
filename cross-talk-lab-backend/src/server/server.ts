@@ -6,7 +6,7 @@ export class Server {
     public app: Express;
 
     constructor(
-        public readonly PORT = 8080
+        public readonly PORT = 80
     ) {
         this.app = express();
         this.useMiddlewires();
