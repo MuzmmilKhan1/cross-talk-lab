@@ -10,7 +10,7 @@ export async function setOpenAiApiKey() {
         apiKeySetting = new Setting();
         apiKeySetting.key = "OPENAI_API_KEY";
         apiKeySetting.value = DEFAULT_API_KEY;
-        settingRepository.save(apiKeySetting);
+        await settingRepository.save(apiKeySetting);
     }
     
     process.env.OPENAI_API_KEY = apiKeySetting.value;
@@ -19,6 +19,18 @@ export async function setOpenAiApiKey() {
 export async function changeOpenAiApiKey(newKey: string) {
     const apiKeySetting = await settingRepository.findOneBy({ key: 'OPENAI_API_KEY' });
     apiKeySetting.value = newKey;
-    settingRepository.save(apiKeySetting);
+    await settingRepository.save(apiKeySetting);
     process.env.OPENAI_API_KEY = apiKeySetting.value;
+}
+
+export async function changeOpenAiModel(model: string) {
+    let modelSetting = await settingRepository.findOneBy({ key: 'OPENAI_MODEL' }) ;
+
+    if (!modelSetting) {
+        modelSetting = new Setting();
+        modelSetting.key = 'OPENAI_MODEL';
+    }
+
+    modelSetting.value = model;
+    await settingRepository.save(modelSetting);
 }

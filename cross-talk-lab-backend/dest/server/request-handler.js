@@ -12,6 +12,7 @@ const error_controller_1 = require("../controller/error-controller");
 const chat_controller_1 = require("../controller/chat-controller");
 const statistics_controller_1 = require("../controller/statistics-controller");
 const upload_controller_1 = require("../controller/upload-controller");
+const settings_controller_1 = require("../controller/settings-controller");
 class RequestHandler extends server_1.Server {
     constructor() {
         super();
@@ -35,6 +36,9 @@ class RequestHandler extends server_1.Server {
         router.get("/statistics", statisticsController.getAll.bind(statisticsController));
         const uploadController = new upload_controller_1.UploadController();
         router.post("/save-file", uploadController.saveFile.bind(uploadController));
+        const settingsController = new settings_controller_1.SettingsController();
+        router.get("/openai-settings", settingsController.getOpenaiSettings.bind(settingsController));
+        router.post("/openai-settings", settingsController.setOpenaiSettings.bind(settingsController));
         const errorController = new error_controller_1.ErrorController();
         router.use(errorController.notFound.bind(errorController));
         router.use(errorController.exception.bind(errorController));

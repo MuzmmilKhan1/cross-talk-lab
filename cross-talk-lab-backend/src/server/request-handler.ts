@@ -6,6 +6,7 @@ import { ErrorController } from "../controller/error-controller";
 import { ChatController } from "../controller/chat-controller";
 import { StatisticsController } from "../controller/statistics-controller";
 import { UploadController } from "../controller/upload-controller";
+import { SettingsController } from "../controller/settings-controller";
 
 export class RequestHandler extends Server {
 
@@ -36,6 +37,10 @@ export class RequestHandler extends Server {
 
         const uploadController = new UploadController();
         router.post("/save-file", uploadController.saveFile.bind(uploadController));
+
+        const settingsController = new SettingsController();
+        router.get("/openai-settings", settingsController.getOpenaiSettings.bind(settingsController));
+        router.post("/openai-settings", settingsController.setOpenaiSettings.bind(settingsController));
         
         const errorController = new ErrorController();
         router.use(errorController.notFound.bind(errorController));

@@ -12,6 +12,7 @@ import { Scrape } from './Pages/Scrape.jsx';
 import { Chatbot } from './Pages/Chatbot.jsx';
 import { Chats } from './Pages/Chats.jsx';
 import { NewChat } from './Pages/NewChat.jsx';
+import { Settings } from './Pages/Settings.jsx';
 
 const router = createBrowserRouter([
   {
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
     path: "new-chat",
     element: <NewChat />,
   },
+  {
+    path: "settings",
+    element: <Settings />
+  }
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(

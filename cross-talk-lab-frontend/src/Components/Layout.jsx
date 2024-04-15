@@ -1,4 +1,4 @@
-import { IconContainer, IconDashboard, IconMessageChatbot } from "@tabler/icons-react";
+import { IconContainer, IconDashboard, IconMessageChatbot, IconSettings } from "@tabler/icons-react";
 import { SidebarItem } from "./SidebarItem";
 
 export function Layout({ children, title = '' }) {
@@ -12,6 +12,7 @@ export function Layout({ children, title = '' }) {
                     <SidebarItem label="Dashboard" href="/" icon={<IconDashboard />} />
                     <SidebarItem label="Scrape" href="/scrape" icon={<IconContainer />} />
                     <SidebarItem label="Chatbot" href="/chats" icon={<IconMessageChatbot />} />
+                    <SidebarItem label="Settings" href="/settings" icon={<IconSettings />} />
                 </div>
             </div>
 
