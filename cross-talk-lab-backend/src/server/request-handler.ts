@@ -1,3 +1,5 @@
+import path from "path";
+import express from "express";
 import { Server } from "./server";
 import { ScrapeController } from "../controller/scrape-controller";
 import { ErrorController } from "../controller/error-controller";
@@ -14,28 +16,38 @@ export class RequestHandler extends Server {
     }
 
     public route() {
+        const router = express.Router();
+
         const scrapeController = new ScrapeController();
-        this.app.post("/scrape", scrapeController.scrape.bind(scrapeController));
-        this.app.get("/scrape-history", scrapeController.scrapeHistory.bind(scrapeController));
+        router.post("/scrape", scrapeController.scrape.bind(scrapeController));
+        router.get("/scrape-history", scrapeController.scrapeHistory.bind(scrapeController));
 
         const chatController = new ChatController();
-        this.app.get("/chats", chatController.index.bind(chatController));
-        this.app.get("/chats/:id", chatController.read.bind(chatController));
-        this.app.post("/chats", chatController.create.bind(chatController));
-        this.app.put("/chats/:id", chatController.update.bind(chatController));
-        this.app.delete("/chats/:id", chatController.delete.bind(chatController));
-        this.app.post("/search-similar", chatController.searchSimilar.bind(chatController));
-        this.app.post("/answer-question", chatController.answer.bind(chatController));
+        router.get("/chats", chatController.index.bind(chatController));
+        router.get("/chats/:id", chatController.read.bind(chatController));
+        router.post("/chats", chatController.create.bind(chatController));
+        router.put("/chats/:id", chatController.update.bind(chatController));
+        router.delete("/chats/:id", chatController.delete.bind(chatController));
+        router.post("/search-similar", chatController.searchSimilar.bind(chatController));
+        router.post("/answer-question", chatController.answer.bind(chatController));
 
         const statisticsController = new StatisticsController();
-        this.app.get("/statistics", statisticsController.getAll.bind(statisticsController));
+        router.get("/statistics", statisticsController.getAll.bind(statisticsController));
 
         const uploadController = new UploadController();
-        this.app.post("/save-file", uploadController.saveFile.bind(uploadController));
+        router.post("/save-file", uploadController.saveFile.bind(uploadController));
         
         const errorController = new ErrorController();
-        this.app.use(errorController.notFound.bind(errorController));
-        this.app.use(errorController.exception.bind(errorController));
+        router.use(errorController.notFound.bind(errorController));
+        router.use(errorController.exception.bind(errorController));
+
+        this.app.use("/api", router);
+
+        const publicPath = path.resolve("../cross-talk-lab-frontend/dist");
+        const indexFile = path.resolve("../cross-talk-lab-frontend/dist/index.html");
+        
+        this.app.use( express.static(publicPath) );
+        this.app.use((req, res) => res.sendFile(indexFile));
     }
 
 }
