@@ -43,9 +43,21 @@ class ChatController {
             relations: { messages: true }
         });
         const vectorDataPath = chat.vectorDataPath;
-        const vectorData = await vector_data_1.VectorData.load(vectorDataPath);
+        let vectorStores = [];
+        if (vectorDataPath) {
+            const vectorData = await vector_data_1.VectorData.load(vectorDataPath);
+            vectorStores.push(vectorData.vectorStore);
+        }
+        else {
+            const scrapeHistory = await app_datasource_1.scrapeHistoryRepository.find();
+            const vectorStoresP = scrapeHistory.map(async (single) => {
+                const vd = await vector_data_1.VectorData.load(single.path);
+                return vd.vectorStore;
+            });
+            vectorStores = await Promise.all(vectorStoresP);
+        }
         const chainer = new chainer_1.Chainer();
-        const reply = await chainer.answerQuestion(question, vectorData.vectorStore);
+        const reply = await chainer.answerQuestion(question, vectorStores);
         const questionMessage = new message_1.Message();
         questionMessage.type = "sent";
         questionMessage.content = question;

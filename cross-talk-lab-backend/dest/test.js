@@ -8,7 +8,7 @@ async function test() {
     const vectorDataPath = "vector-database/0634459f-e511-4dd3-9545-52605cadf96f";
     const vectorData = await vector_data_1.VectorData.load(vectorDataPath);
     const chainer = new chainer_1.Chainer();
-    const answer = await chainer.answerQuestion(question, vectorData.vectorStore);
+    const answer = await chainer.answerQuestion(question, [vectorData.vectorStore]);
     console.log(answer);
 }
 test();

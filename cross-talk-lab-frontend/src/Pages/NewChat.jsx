@@ -23,7 +23,6 @@ export function NewChat() {
             const response = await backendRequest("get", "/scrape-history");
             if (!ignore) {
                 setScrapeHistory(response);
-                setVectorDataPath(response[0]?.path || "");
             }
         })();
 
@@ -55,6 +54,7 @@ export function NewChat() {
                             <Input name="name" label="Chat Name" onChange={e => setName(e.target.value)} value={name} autoComplete="off" className="mb-4" />
 
                             <Select label="Question About" value={vectorDataPath} onChange={e => setVectorDataPath(e.target.value)} name="vectorDataPath">
+                                <option value="">All Documents</option>
                                 {scrapeHistory.map(single => 
                                     <option value={single.path} key={single.id}>{ single.name }</option>
                                 )}

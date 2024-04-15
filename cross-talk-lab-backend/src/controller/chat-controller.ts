@@ -1,9 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import { chatRepository } from "../models/app-datasource";
+import { chatRepository, scrapeHistoryRepository } from "../models/app-datasource";
 import { Chat } from "../models/chat";
 import { VectorData } from "../helpers/vector-data";
 import { Chainer } from "../helpers/chainer";
 import { Message } from "../models/message";
+import { VectorStore } from "langchain/vectorstores/base";
 
 interface IAnswer {
     chatId: string,
@@ -62,10 +63,22 @@ export class ChatController {
             relations: { messages: true }
         });
         const vectorDataPath = chat.vectorDataPath;
-        const vectorData = await VectorData.load(vectorDataPath);
+
+        let vectorStores: VectorStore[] = [];
+        if (vectorDataPath) {
+            const vectorData = await VectorData.load(vectorDataPath);
+            vectorStores.push(vectorData.vectorStore);
+        } else {
+            const scrapeHistory = await scrapeHistoryRepository.find();
+            const vectorStoresP = scrapeHistory.map(async single => {
+                const vd = await VectorData.load(single.path); 
+                return vd.vectorStore;
+            });
+            vectorStores = await Promise.all(vectorStoresP);
+        }
 
         const chainer = new Chainer();
-        const reply = await chainer.answerQuestion(question, vectorData.vectorStore);
+        const reply = await chainer.answerQuestion(question, vectorStores);
 
         const questionMessage = new Message();
         questionMessage.type = "sent";
