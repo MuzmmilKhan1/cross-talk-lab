@@ -7,17 +7,27 @@ import { ChatController } from "../controller/chat-controller";
 import { StatisticsController } from "../controller/statistics-controller";
 import { UploadController } from "../controller/upload-controller";
 import { SettingsController } from "../controller/settings-controller";
+import { AuthenticationController } from "../controller/authentication-controller";
+import { checkLoggedIn } from "../helpers/check-loggedin";
 
 export class RequestHandler extends Server {
 
     constructor() {
         super();
-        this.route();
+        this.routeApi();
+        this.routeStaticFiles();
         this.start();
     }
 
-    public route() {
+    public routeApi() {
         const router = express.Router();
+
+        const authenticationController = new AuthenticationController();
+        router.post("/login", authenticationController.login.bind(authenticationController));
+        router.post("/logout", authenticationController.logout.bind(authenticationController));
+        router.get("/login-status", authenticationController.loginStatus.bind(authenticationController));
+
+        router.use(checkLoggedIn);
 
         const scrapeController = new ScrapeController();
         router.post("/scrape", scrapeController.scrape.bind(scrapeController));
@@ -47,7 +57,9 @@ export class RequestHandler extends Server {
         router.use(errorController.exception.bind(errorController));
 
         this.app.use("/api", router);
+    }
 
+    public routeStaticFiles() {
         const publicPath = path.resolve("../cross-talk-lab-frontend/dist");
         const indexFile = path.resolve("../cross-talk-lab-frontend/dist/index.html");
         

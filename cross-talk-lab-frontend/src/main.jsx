@@ -13,33 +13,62 @@ import { Chatbot } from './Pages/Chatbot.jsx';
 import { Chats } from './Pages/Chats.jsx';
 import { NewChat } from './Pages/NewChat.jsx';
 import { Settings } from './Pages/Settings.jsx';
+import { Login } from './Pages/Login.jsx';
+import { Authenticated } from './Components/Authenticated.jsx';
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: (
-      <Dashboard />
+      <Authenticated>
+        <Dashboard />
+      </Authenticated>
     ),
   },
   {
     path: "scrape",
-    element: <Scrape />,
+    element: (
+      <Authenticated>
+        <Scrape />
+      </Authenticated>
+    ),
   },
   {
     path: "chats",
-    element: <Chats />,
+    element: (
+      <Authenticated>
+        <Chats />
+      </Authenticated>
+    ),
   },
   {
     path: "chats/:id",
-    element: <Chatbot />,
+    element: (
+      <Authenticated>
+        <Chatbot />
+      </Authenticated>
+
+    ),
   },
   {
     path: "new-chat",
-    element: <NewChat />,
+    element: (
+      <Authenticated>
+        <NewChat />
+      </Authenticated>
+    ),
   },
   {
     path: "settings",
-    element: <Settings />
+    element: (
+      <Authenticated>
+        <Settings />
+      </Authenticated>
+    )
+  },
+  {
+    path: "login",
+    element: <Login />
   }
 ]);
 

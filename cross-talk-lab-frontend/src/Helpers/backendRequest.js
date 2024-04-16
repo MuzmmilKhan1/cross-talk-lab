@@ -20,6 +20,6 @@ export async function backendRequest(method, url, body, multipart = false) {
         "Content-Type": "application/json"
     };
 
-    const response = await fetch(url, { method, body, headers });
+    const response = await fetch(url, { method, body, headers, credentials: 'include' });
     return await response.json();
 }

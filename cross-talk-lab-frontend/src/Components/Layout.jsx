@@ -1,7 +1,18 @@
 import { IconContainer, IconDashboard, IconMessageChatbot, IconSettings } from "@tabler/icons-react";
 import { SidebarItem } from "./SidebarItem";
+import { backendRequest } from "../Helpers/backendRequest";
+import { useNavigate } from "react-router-dom";
 
 export function Layout({ children, title = '' }) {
+    const navigate = useNavigate();
+
+    async function logout(e) {
+        e.preventDefault();
+        await backendRequest("POST", "/logout");
+        window.isLoggedIn = false;
+        navigate("/login");
+    }
+
     return (
         <div className="w-[100vw] h-[100vh] flex">
 
@@ -17,8 +28,9 @@ export function Layout({ children, title = '' }) {
             </div>
 
             <div className="flex-grow p-5 overflow-auto">
-                <div className="d-flex justify-between mb-7">
+                <div className="flex justify-between mb-7">
                     <h1 className="text-2xl font-semibold">{ title }</h1>
+                    <a href="" onClick={logout}>Logout</a>
                 </div>
 
                 { children }

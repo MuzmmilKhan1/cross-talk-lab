@@ -13,14 +13,22 @@ const chat_controller_1 = require("../controller/chat-controller");
 const statistics_controller_1 = require("../controller/statistics-controller");
 const upload_controller_1 = require("../controller/upload-controller");
 const settings_controller_1 = require("../controller/settings-controller");
+const authentication_controller_1 = require("../controller/authentication-controller");
+const check_loggedin_1 = require("../helpers/check-loggedin");
 class RequestHandler extends server_1.Server {
     constructor() {
         super();
-        this.route();
+        this.routeApi();
+        this.routeStaticFiles();
         this.start();
     }
-    route() {
+    routeApi() {
         const router = express_1.default.Router();
+        const authenticationController = new authentication_controller_1.AuthenticationController();
+        router.post("/login", authenticationController.login.bind(authenticationController));
+        router.post("/logout", authenticationController.logout.bind(authenticationController));
+        router.get("/login-status", authenticationController.loginStatus.bind(authenticationController));
+        router.use(check_loggedin_1.checkLoggedIn);
         const scrapeController = new scrape_controller_1.ScrapeController();
         router.post("/scrape", scrapeController.scrape.bind(scrapeController));
         router.get("/scrape-history", scrapeController.scrapeHistory.bind(scrapeController));
@@ -43,6 +51,8 @@ class RequestHandler extends server_1.Server {
         router.use(errorController.notFound.bind(errorController));
         router.use(errorController.exception.bind(errorController));
         this.app.use("/api", router);
+    }
+    routeStaticFiles() {
         const publicPath = path_1.default.resolve("../cross-talk-lab-frontend/dist");
         const indexFile = path_1.default.resolve("../cross-talk-lab-frontend/dist/index.html");
         this.app.use(express_1.default.static(publicPath));
