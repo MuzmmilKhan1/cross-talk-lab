@@ -8,6 +8,7 @@ const path_1 = require("path");
 const promises_1 = __importDefault(require("fs/promises"));
 const mammoth_1 = __importDefault(require("mammoth"));
 const pdf_parse_1 = __importDefault(require("pdf-parse"));
+const image_text_1 = require("./image-text");
 class FileReader {
     prepareResult(text) {
         return text
@@ -29,8 +30,13 @@ class FileReader {
         const data = await (0, pdf_parse_1.default)(buffer);
         return this.prepareResult(data.text);
     }
+    async readImage(path) {
+        const imageText = await image_text_1.ImageText.instantiate();
+        return await imageText.extractParagraphs(path);
+    }
     async read(path, extension) {
-        extension = extension || (0, path_1.extname)(path).toLowerCase();
+        extension = extension || (0, path_1.extname)(path);
+        extension = extension.toLowerCase();
         switch (extension) {
             case ".txt":
                 return this.readTxt(path);
@@ -38,6 +44,12 @@ class FileReader {
                 return this.readDocx(path);
             case ".pdf":
                 return this.readPdf(path);
+            case ".bmp":
+            case ".jpg":
+            case ".png":
+            case ".pbm":
+            case ".webp":
+                return this.readImage(path);
             default:
                 return [];
         }

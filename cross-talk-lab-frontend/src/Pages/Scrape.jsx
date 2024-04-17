@@ -55,6 +55,11 @@ export function Scrape() {
                         className="mb-6"
                         autoComplete="off" />
 
+                    <div className="flex gap-2 items-center mb-3">
+                        <input type="checkbox" name="followLinks" id="followLinks" className="w-4 h-4" />
+                        <label htmlFor="followLinks">Follow Links</label>
+                    </div>
+
                     <Button>Scrape</Button>
 
                     <p className="my-6">{status}</p>
@@ -75,7 +80,7 @@ export function Scrape() {
                         label="Upload Document"
                         className="mb-6"
                         name="file"
-                        accept=".txt,.docx,.pdf" />
+                        accept=".txt,.docx,.pdf,.bmp,.jpg,.png,.pbm,.webp" />
 
                     <Button>Get Content</Button>
 

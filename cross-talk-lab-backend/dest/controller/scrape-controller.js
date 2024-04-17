@@ -9,9 +9,13 @@ const scrape_history_1 = require("../models/scrape-history");
 class ScrapeController {
     async scrape(req, res, next) {
         try {
-            const { url, name } = req.body;
+            const { url, name, followLinks } = req.body;
             const scrapper = new scrapper_1.Scrapper(url);
-            const paragraphs = await scrapper.getParagraphs();
+            let paragraphs = [];
+            if (followLinks === "on")
+                paragraphs = (await scrapper.getParagraphsRecursively()).flat();
+            else
+                paragraphs = await scrapper.getParagraphs();
             const id = (0, uuid_1.v4)();
             const path = `vector-database/${id}`;
             await vector_data_1.VectorData.make(paragraphs, path);

@@ -7,17 +7,23 @@ import { ScrapeHistory } from "../models/scrape-history";
 
 interface IScrape {
     url: string,
-    name: string
+    name: string,
+    followLinks?: string
 }
 
 export class ScrapeController {
 
     public async scrape(req: Request, res: Response, next: NextFunction) {
         try {
-            const { url, name } = req.body as IScrape;
+            const { url, name, followLinks } = req.body as IScrape;
 
             const scrapper = new Scrapper(url);
-            const paragraphs = await scrapper.getParagraphs();
+            let paragraphs: string[] = [];
+            
+            if (followLinks === "on")
+                paragraphs = (await scrapper.getParagraphsRecursively()).flat()
+            else
+                paragraphs = await scrapper.getParagraphs();
 
             const id = uuid();
             const path = `vector-database/${id}`;

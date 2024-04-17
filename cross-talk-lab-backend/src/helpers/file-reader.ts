@@ -2,6 +2,7 @@ import { extname } from "path";
 import fsp from "fs/promises";
 import mammoth from "mammoth";
 import pdf from "pdf-parse";
+import { ImageText } from "./image-text";
 
 export class FileReader {
 
@@ -14,7 +15,7 @@ export class FileReader {
 
     public async readTxt(path: string): Promise<string[]> {
         const content = await fsp.readFile(path);
-        return this.prepareResult( content.toString() );
+        return this.prepareResult(content.toString());
     }
 
     public async readDocx(path: string): Promise<string[]> {
@@ -29,8 +30,14 @@ export class FileReader {
         return this.prepareResult(data.text);
     }
 
+    private async readImage(path: string): Promise<string[]> {
+        const imageText = await ImageText.instantiate();
+        return await imageText.extractParagraphs(path);
+    }
+
     public async read(path: string, extension?: string): Promise<string[]> {
-        extension = extension || extname(path).toLowerCase();
+        extension = extension || extname(path);
+        extension = extension.toLowerCase();
 
         switch (extension) {
             case ".txt":
@@ -39,6 +46,12 @@ export class FileReader {
                 return this.readDocx(path);
             case ".pdf":
                 return this.readPdf(path);
+            case ".bmp":
+            case ".jpg":
+            case ".png":
+            case ".pbm":
+            case ".webp":
+                return this.readImage(path);
             default:
                 return [];
         }
