@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { chatRepository, scrapeHistoryRepository } from "../models/app-datasource";
 import { Chat } from "../models/chat";
 import { VectorData } from "../helpers/vector-data";
-import { Chainer } from "../helpers/chainer";
+import { Chainer, GPTMessage } from "../helpers/chainer";
 import { Message } from "../models/message";
 import { VectorStore } from "langchain/vectorstores/base";
 
@@ -62,6 +62,10 @@ export class ChatController {
             where: { id: chatId },
             relations: { messages: true }
         });
+        const messageHistory: GPTMessage[] = chat.messages.map(m => [
+            m.type === 'sent' ? 'human' : 'ai', 
+            m.content
+        ]);
         const vectorDataPath = chat.vectorDataPath;
 
         let vectorStores: VectorStore[] = [];
@@ -78,7 +82,7 @@ export class ChatController {
         }
 
         const chainer = new Chainer();
-        const reply = await chainer.answerQuestion(question, vectorStores);
+        const reply = await chainer.answerQuestion(question, vectorStores, messageHistory);
 
         const questionMessage = new Message();
         questionMessage.type = "sent";

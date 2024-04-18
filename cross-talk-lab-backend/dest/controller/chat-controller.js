@@ -42,6 +42,10 @@ class ChatController {
             where: { id: chatId },
             relations: { messages: true }
         });
+        const messageHistory = chat.messages.map(m => [
+            m.type === 'sent' ? 'human' : 'ai',
+            m.content
+        ]);
         const vectorDataPath = chat.vectorDataPath;
         let vectorStores = [];
         if (vectorDataPath) {
@@ -57,7 +61,7 @@ class ChatController {
             vectorStores = await Promise.all(vectorStoresP);
         }
         const chainer = new chainer_1.Chainer();
-        const reply = await chainer.answerQuestion(question, vectorStores);
+        const reply = await chainer.answerQuestion(question, vectorStores, messageHistory);
         const questionMessage = new message_1.Message();
         questionMessage.type = "sent";
         questionMessage.content = question;

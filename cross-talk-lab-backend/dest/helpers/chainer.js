@@ -6,46 +6,25 @@ const prompts_1 = require("@langchain/core/prompts");
 const output_parsers_1 = require("@langchain/core/output_parsers");
 const runnables_1 = require("@langchain/core/runnables");
 class Chainer {
-    // public async answerQuestion(question: string, vectorStore: VectorStore) {
-    //     const prompt = ChatPromptTemplate.fromMessages([
-    //         [
-    //             "ai",
-    //             "Answer the question based on only the following context:\n{context}",
-    //         ],
-    //         ["human", "{question}"],
-    //     ]);
-    //     const chatModel = new ChatOpenAI({});
-    //     const outputParser = new StringOutputParser();
-    //     const retriever = vectorStore.asRetriever(1);
-    //     const setupAndRetrieval = RunnableMap.from({
-    //         context: new RunnableLambda({
-    //             func: async (input: string) => {
-    //                 const res = await retriever.invoke(input);
-    //                 return res.map(sing => sing.pageContent).join("\n")
-    //             },
-    //         }).withConfig({ runName: "contextRetriever" }),
-    //         question: new RunnablePassthrough(),
-    //     });
-    //     const chain = setupAndRetrieval.pipe(prompt).pipe(chatModel).pipe(outputParser);
-    //     return await chain.invoke(question);
-    // }
-    async answerQuestion(question, vectorStores) {
-        const prompt = prompts_1.ChatPromptTemplate.fromMessages([
+    async answerQuestion(question, vectorStores, messageHistory) {
+        let messages = [
             [
                 "ai",
                 "Answer the question based on only the following context:\n{context}",
             ],
+            ...messageHistory,
             ["human", "{question}"],
-        ]);
+        ];
+        const prompt = prompts_1.ChatPromptTemplate.fromMessages(messages);
         const chatModel = new openai_1.ChatOpenAI({});
         const outputParser = new output_parsers_1.StringOutputParser();
-        const retrievers = vectorStores.map(vs => vs.asRetriever(1)); // Create a retriever for each VectorStore
+        const retrievers = vectorStores.map(vs => vs.asRetriever(1));
         const contextRetrieval = new runnables_1.RunnableLambda({
             func: async (input) => {
                 const contexts = await Promise.all(retrievers.map(retriever => retriever.invoke(input)));
                 return contexts
                     .map(res => res.map(sing => sing.pageContent).join("\n"))
-                    .join("\n\n"); // Separate contexts from different stores with a double newline
+                    .join("\n\n");
             },
         }).withConfig({ runName: "contextRetriever" });
         const setupAndRetrieval = runnables_1.RunnableMap.from({
