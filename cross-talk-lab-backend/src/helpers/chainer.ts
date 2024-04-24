@@ -8,30 +8,31 @@ import {
 } from "@langchain/core/runnables";
 import { VectorStore } from "langchain/vectorstores/base";
 
-export type GPTMessage = ["ai" | "human", string];
+export type GPTMessage = ["system" | "user" | "assistant", string];
 
 export class Chainer {
 
     public async answerQuestion(question: string, vectorStores: VectorStore[], messageHistory: GPTMessage[]) {
         let messages: GPTMessage[] = [
-            [
-                "ai",
-                "Answer the question based on only the following context:\n{context}",
-            ],
             ...messageHistory,
-            ["human", "{question}"],
+            [
+                "system",
+                "Context:\n{context}",
+            ],
+            ["user", "{question}"],
         ];
         const prompt = ChatPromptTemplate.fromMessages(messages);
         const chatModel = new ChatOpenAI({});
         const outputParser = new StringOutputParser();
 
+        let retrivedContext: string = "";
         const retrievers = vectorStores.map(vs => vs.asRetriever(1));
         const contextRetrieval = new RunnableLambda({
             func: async (input: string) => {
                 const contexts = await Promise.all(
                     retrievers.map(retriever => retriever.invoke(input))
                 );
-                return contexts
+                return retrivedContext = contexts
                     .map(res => res.map(sing => sing.pageContent).join("\n"))
                     .join("\n\n");
             },
@@ -44,7 +45,9 @@ export class Chainer {
 
         const chain = setupAndRetrieval.pipe(prompt).pipe(chatModel).pipe(outputParser);
 
-        return await chain.invoke(question);
+        const reply = await chain.invoke(question);
+
+        return { retrivedContext, reply };
     }
 
 }

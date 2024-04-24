@@ -10,7 +10,7 @@ export class Message {
     content: string
 
     @Column()
-    type: "sent" | "received"
+    type: "sent" | "received" | "context"
 
     @ManyToOne(() => Chat, chat => chat.messages)
     chat: Chat

@@ -8,21 +8,22 @@ const runnables_1 = require("@langchain/core/runnables");
 class Chainer {
     async answerQuestion(question, vectorStores, messageHistory) {
         let messages = [
-            [
-                "ai",
-                "Answer the question based on only the following context:\n{context}",
-            ],
             ...messageHistory,
-            ["human", "{question}"],
+            [
+                "system",
+                "Context:\n{context}",
+            ],
+            ["user", "{question}"],
         ];
         const prompt = prompts_1.ChatPromptTemplate.fromMessages(messages);
         const chatModel = new openai_1.ChatOpenAI({});
         const outputParser = new output_parsers_1.StringOutputParser();
+        let retrivedContext = "";
         const retrievers = vectorStores.map(vs => vs.asRetriever(1));
         const contextRetrieval = new runnables_1.RunnableLambda({
             func: async (input) => {
                 const contexts = await Promise.all(retrievers.map(retriever => retriever.invoke(input)));
-                return contexts
+                return retrivedContext = contexts
                     .map(res => res.map(sing => sing.pageContent).join("\n"))
                     .join("\n\n");
             },
@@ -32,7 +33,8 @@ class Chainer {
             question: new runnables_1.RunnablePassthrough(),
         });
         const chain = setupAndRetrieval.pipe(prompt).pipe(chatModel).pipe(outputParser);
-        return await chain.invoke(question);
+        const reply = await chain.invoke(question);
+        return { retrivedContext, reply };
     }
 }
 exports.Chainer = Chainer;

@@ -25,6 +25,7 @@ class ChatController {
             where: { id },
             relations: { messages: true }
         });
+        chat.messages = chat.messages.filter(m => m.type !== "context");
         res.json(chat);
     }
     async update(req, res) {
@@ -43,8 +44,10 @@ class ChatController {
             relations: { messages: true }
         });
         const messageHistory = chat.messages.map(m => [
-            m.type === 'sent' ? 'human' : 'ai',
-            m.content
+            m.type === 'sent' ? 'user' :
+                m.type === 'context' ? 'system' :
+                    'assistant',
+            `${m.type === "context" ? "Context: " : ""}${m.content}`
         ]);
         const vectorDataPath = chat.vectorDataPath;
         let vectorStores = [];
@@ -61,7 +64,10 @@ class ChatController {
             vectorStores = await Promise.all(vectorStoresP);
         }
         const chainer = new chainer_1.Chainer();
-        const reply = await chainer.answerQuestion(question, vectorStores, messageHistory);
+        const { retrivedContext, reply } = await chainer.answerQuestion(question, vectorStores, messageHistory);
+        const contextMessage = new message_1.Message();
+        contextMessage.type = "context";
+        contextMessage.content = retrivedContext;
         const questionMessage = new message_1.Message();
         questionMessage.type = "sent";
         questionMessage.content = question;
@@ -69,7 +75,7 @@ class ChatController {
         answerMessage.type = "received";
         answerMessage.content = reply;
         chat.messages = chat.messages || [];
-        chat.messages.push(questionMessage, answerMessage);
+        chat.messages.push(contextMessage, questionMessage, answerMessage);
         await app_datasource_1.chatRepository.save(chat);
         res.json({ success: true, answer: reply });
     }

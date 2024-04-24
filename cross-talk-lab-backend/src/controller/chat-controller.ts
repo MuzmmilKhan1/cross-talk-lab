@@ -40,6 +40,7 @@ export class ChatController {
             where: { id },
             relations: { messages: true }
         });
+        chat.messages = chat.messages.filter(m => m.type !== "context");
         res.json(chat);
     }
 
@@ -63,8 +64,10 @@ export class ChatController {
             relations: { messages: true }
         });
         const messageHistory: GPTMessage[] = chat.messages.map(m => [
-            m.type === 'sent' ? 'human' : 'ai', 
-            m.content
+            m.type === 'sent' ? 'user' : 
+            m.type === 'context' ? 'system' :
+            'assistant',
+            `${m.type === "context" ? "Context: " : ""}${m.content}`
         ]);
         const vectorDataPath = chat.vectorDataPath;
 
@@ -82,8 +85,10 @@ export class ChatController {
         }
 
         const chainer = new Chainer();
-        const reply = await chainer.answerQuestion(question, vectorStores, messageHistory);
-
+        const { retrivedContext, reply } = await chainer.answerQuestion(question, vectorStores, messageHistory);
+        const contextMessage = new Message();
+        contextMessage.type = "context";
+        contextMessage.content = retrivedContext;
         const questionMessage = new Message();
         questionMessage.type = "sent";
         questionMessage.content = question;
@@ -91,7 +96,7 @@ export class ChatController {
         answerMessage.type = "received";
         answerMessage.content = reply;
         chat.messages = chat.messages || [];
-        chat.messages.push(questionMessage, answerMessage);
+        chat.messages.push(contextMessage, questionMessage, answerMessage);
         await chatRepository.save(chat);
 
         res.json({ success: true, answer: reply });
