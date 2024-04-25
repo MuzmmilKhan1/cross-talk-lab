@@ -18,7 +18,6 @@ class Scrapper {
         let cursor = 0;
         while (cursor < links.length) {
             const link = links[cursor];
-            // console.log(link);
             const response = await fetch(link);
             const content = await response.text();
             const dom = new jsdom_1.JSDOM(content);
@@ -34,7 +33,7 @@ class Scrapper {
                     links.push(newLink);
             });
             const paragraphs = [
-                ...dom.window.document.getElementsByTagName("p")
+                ...dom.window.document.querySelectorAll("p, ul")
             ].map(paragraph => paragraph.textContent.trim()).filter(paragraph => paragraph !== "");
             contents.push(paragraphs);
             cursor++;
@@ -51,9 +50,10 @@ class Scrapper {
     }
     async getParagraphs() {
         const dom = await this.getDOM();
-        return [
-            ...dom.window.document.querySelectorAll("p")
+        const paragraphs = [
+            ...dom.window.document.querySelectorAll("p, ul")
         ].map(paragraph => paragraph.textContent.trim()).filter(p => p !== "");
+        return paragraphs;
     }
 }
 exports.Scrapper = Scrapper;

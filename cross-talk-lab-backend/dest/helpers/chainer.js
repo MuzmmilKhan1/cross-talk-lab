@@ -6,15 +6,17 @@ const prompts_1 = require("@langchain/core/prompts");
 const output_parsers_1 = require("@langchain/core/output_parsers");
 const runnables_1 = require("@langchain/core/runnables");
 class Chainer {
-    async answerQuestion(question, vectorStores, messageHistory) {
+    async answerQuestion(question, vectorStores, messageHistory, chatbotRole) {
         let messages = [
+            ["system", chatbotRole],
             ...messageHistory,
-            [
-                "system",
-                "Context:\n{context}",
-            ],
+            // [
+            //     "system",
+            //     "Context:\n{context}",
+            // ],
             ["user", "{question}"],
         ];
+        // console.log(messages);
         const prompt = prompts_1.ChatPromptTemplate.fromMessages(messages);
         const chatModel = new openai_1.ChatOpenAI({});
         const outputParser = new output_parsers_1.StringOutputParser();

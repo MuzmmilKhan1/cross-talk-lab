@@ -12,15 +12,17 @@ export type GPTMessage = ["system" | "user" | "assistant", string];
 
 export class Chainer {
 
-    public async answerQuestion(question: string, vectorStores: VectorStore[], messageHistory: GPTMessage[]) {
+    public async answerQuestion(question: string, vectorStores: VectorStore[], messageHistory: GPTMessage[], chatbotRole: string) {
         let messages: GPTMessage[] = [
+            [ "system", chatbotRole ],
             ...messageHistory,
-            [
-                "system",
-                "Context:\n{context}",
-            ],
+            // [
+            //     "system",
+            //     "Context:\n{context}",
+            // ],
             ["user", "{question}"],
         ];
+        // console.log(messages);
         const prompt = ChatPromptTemplate.fromMessages(messages);
         const chatModel = new ChatOpenAI({});
         const outputParser = new StringOutputParser();

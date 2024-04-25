@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { chatRepository, scrapeHistoryRepository } from "../models/app-datasource";
+import { chatRepository, scrapeHistoryRepository, settingRepository } from "../models/app-datasource";
 import { Chat } from "../models/chat";
 import { VectorData } from "../helpers/vector-data";
 import { Chainer, GPTMessage } from "../helpers/chainer";
@@ -59,16 +59,25 @@ export class ChatController {
         const chatId = parseInt(body.chatId);
         const question = body.question;
 
+        const chatbotRole = (await settingRepository.findOneBy({ key: 'CHATBOT_ROLE' })).value;
         const chat = await chatRepository.findOne({
             where: { id: chatId },
             relations: { messages: true }
         });
-        const messageHistory: GPTMessage[] = chat.messages.map(m => [
-            m.type === 'sent' ? 'user' : 
-            m.type === 'context' ? 'system' :
-            'assistant',
-            `${m.type === "context" ? "Context: " : ""}${m.content}`
-        ]);
+        // const messageHistory: GPTMessage[] = chat.messages.map(m => [
+        //     m.type === 'sent' ? 'user' : 
+        //     m.type === 'context' ? 'system' :
+        //     'assistant',
+        //     `${m.type === "context" ? "Context: " : ""}${m.content}`
+        // ]);
+        const messageHistory: GPTMessage[] = [
+            ['system', "Here is the Context retrived from vector database, you have to answer from it: \n{context}\n" ]
+        ];
+        for (const message of chat.messages) {
+            if (message.type === "context") messageHistory[0][1] += message.content + "\n";
+            else if (message.type === "received") messageHistory.push([ "assistant", message.content ]);
+            else if (message.type === "sent") messageHistory.push(["user", message.content]);
+        }
         const vectorDataPath = chat.vectorDataPath;
 
         let vectorStores: VectorStore[] = [];
@@ -85,7 +94,7 @@ export class ChatController {
         }
 
         const chainer = new Chainer();
-        const { retrivedContext, reply } = await chainer.answerQuestion(question, vectorStores, messageHistory);
+        const { retrivedContext, reply } = await chainer.answerQuestion(question, vectorStores, messageHistory, chatbotRole);
         const contextMessage = new Message();
         contextMessage.type = "context";
         contextMessage.content = retrivedContext;

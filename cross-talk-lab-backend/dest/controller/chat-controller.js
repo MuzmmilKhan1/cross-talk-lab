@@ -39,16 +39,28 @@ class ChatController {
         const body = req.body;
         const chatId = parseInt(body.chatId);
         const question = body.question;
+        const chatbotRole = (await app_datasource_1.settingRepository.findOneBy({ key: 'CHATBOT_ROLE' })).value;
         const chat = await app_datasource_1.chatRepository.findOne({
             where: { id: chatId },
             relations: { messages: true }
         });
-        const messageHistory = chat.messages.map(m => [
-            m.type === 'sent' ? 'user' :
-                m.type === 'context' ? 'system' :
-                    'assistant',
-            `${m.type === "context" ? "Context: " : ""}${m.content}`
-        ]);
+        // const messageHistory: GPTMessage[] = chat.messages.map(m => [
+        //     m.type === 'sent' ? 'user' : 
+        //     m.type === 'context' ? 'system' :
+        //     'assistant',
+        //     `${m.type === "context" ? "Context: " : ""}${m.content}`
+        // ]);
+        const messageHistory = [
+            ['system', "Here is the Context retrived from vector database, you have to answer from it: \n{context}\n"]
+        ];
+        for (const message of chat.messages) {
+            if (message.type === "context")
+                messageHistory[0][1] += message.content + "\n";
+            else if (message.type === "received")
+                messageHistory.push(["assistant", message.content]);
+            else if (message.type === "sent")
+                messageHistory.push(["user", message.content]);
+        }
         const vectorDataPath = chat.vectorDataPath;
         let vectorStores = [];
         if (vectorDataPath) {
@@ -64,7 +76,7 @@ class ChatController {
             vectorStores = await Promise.all(vectorStoresP);
         }
         const chainer = new chainer_1.Chainer();
-        const { retrivedContext, reply } = await chainer.answerQuestion(question, vectorStores, messageHistory);
+        const { retrivedContext, reply } = await chainer.answerQuestion(question, vectorStores, messageHistory, chatbotRole);
         const contextMessage = new message_1.Message();
         contextMessage.type = "context";
         contextMessage.content = retrivedContext;

@@ -7,6 +7,10 @@ interface IOpenAISettings {
     model: string,
 }
 
+interface IRole {
+    role: string
+}
+
 export class SettingsController {
 
     public async getOpenaiSettings(req: Request, res: Response) {
@@ -37,6 +41,22 @@ export class SettingsController {
             changeOpenAiModel(settings.model)
         ]);
         
+        res.json({ success: true });
+    }
+
+    public async getChatbotRole(req: Request, res: Response) {
+        const roleSetting = await settingRepository.findOneBy({ key: 'CHATBOT_ROLE' });
+        res.json({
+            role: roleSetting.value
+        });
+    }
+
+    public async setChatbotRole(req: Request, res: Response) {
+        const { role } = req.body as IRole;
+        const roleSetting = await settingRepository.findOneBy({ key: 'CHATBOT_ROLE' });
+        roleSetting.value = role;
+        await settingRepository.save(roleSetting);
+        console.log(roleSetting);
         res.json({ success: true });
     }
 

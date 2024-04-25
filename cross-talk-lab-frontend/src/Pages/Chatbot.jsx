@@ -6,11 +6,32 @@ import { Input } from "../Components/Input";
 import { Button } from "../Components/Button";
 import { IconSend2 } from "@tabler/icons-react";
 import { Loading } from "../Components/Loading";
+import { parse } from "marked";
 
 export function Message({ type, content }) {
+    const [parsedContent, setParsedContent] = useState("");
+
+    useEffect(() => {
+        (async () => {
+            if (typeof content === "object") return;
+            const parsed = await parse(content);
+            setParsedContent(parsed);
+        })();
+    }, []);
+
     return (
         <div className={`flex ${type == "received" ? "justify-start" : "justify-end"}`}>
-            <div className={`p-3 rounded lg:max-w-[600px] max-w-full  ${type == "received" ? "bg-slate-200" : "bg-sky-300"}`}>{content}</div>
+            {
+                typeof content === "string"
+                    ?
+                    <div
+                        className={`p-3 rounded lg:max-w-[600px] max-w-full message-content ${type == "received" ? "bg-slate-200" : "bg-sky-300"}`}
+                        dangerouslySetInnerHTML={{ __html: parsedContent }}></div>
+                    :
+                    <div
+                        className={`p-3 rounded lg:max-w-[600px] max-w-full message-content ${type == "received" ? "bg-slate-200" : "bg-sky-300"}`}
+                    >{content}</div>
+            }
         </div>
     );
 }

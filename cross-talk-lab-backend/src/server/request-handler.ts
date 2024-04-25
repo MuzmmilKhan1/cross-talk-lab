@@ -51,6 +51,8 @@ export class RequestHandler extends Server {
         const settingsController = new SettingsController();
         router.get("/openai-settings", settingsController.getOpenaiSettings.bind(settingsController));
         router.post("/openai-settings", settingsController.setOpenaiSettings.bind(settingsController));
+        router.get("/chatbot-role", settingsController.getChatbotRole.bind(settingsController));
+        router.post("/chatbot-role", settingsController.setChatbotRole.bind(settingsController));
         
         const errorController = new ErrorController();
         router.use(errorController.notFound.bind(errorController));

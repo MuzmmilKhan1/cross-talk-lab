@@ -31,6 +31,20 @@ class SettingsController {
         ]);
         res.json({ success: true });
     }
+    async getChatbotRole(req, res) {
+        const roleSetting = await app_datasource_1.settingRepository.findOneBy({ key: 'CHATBOT_ROLE' });
+        res.json({
+            role: roleSetting.value
+        });
+    }
+    async setChatbotRole(req, res) {
+        const { role } = req.body;
+        const roleSetting = await app_datasource_1.settingRepository.findOneBy({ key: 'CHATBOT_ROLE' });
+        roleSetting.value = role;
+        await app_datasource_1.settingRepository.save(roleSetting);
+        console.log(roleSetting);
+        res.json({ success: true });
+    }
 }
 exports.SettingsController = SettingsController;
 //# sourceMappingURL=settings-controller.js.map
