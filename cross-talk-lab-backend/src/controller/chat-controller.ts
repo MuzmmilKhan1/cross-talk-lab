@@ -73,7 +73,7 @@ export class ChatController {
         const messageHistory: GPTMessage[] = [
             ['system', "Here is the Context retrived from vector database, you have to answer from it: \n{context}\n" ]
         ];
-        for (const message of chat.messages) {
+        for (const message of chat.messages.slice(-50)) {
             if (message.type === "context") messageHistory[0][1] += message.content + "\n";
             else if (message.type === "received") messageHistory.push([ "assistant", message.content ]);
             else if (message.type === "sent") messageHistory.push(["user", message.content]);

@@ -7,40 +7,41 @@ class Scrapper {
     constructor(url) {
         this.url = url;
     }
-    normalizeUrl(url) {
-        return url[url.length - 1] === "/" ? url : url + "/";
-    }
     async getParagraphsRecursively() {
         const links = [
-            this.normalizeUrl(this.url)
+            this.url
         ];
         const contents = [];
         let cursor = 0;
         while (cursor < links.length) {
             const link = links[cursor];
+            console.log("Fetching " + link);
             const response = await fetch(link);
             const content = await response.text();
             const dom = new jsdom_1.JSDOM(content);
-            [...dom.window.document.getElementsByTagName("a")]
-                .forEach(anchor => {
-                const href = anchor.href;
-                const resolvedLink = new URL(href, link);
-                resolvedLink.hash = "";
-                const newLink = this.normalizeUrl(resolvedLink.href);
-                if (!links.includes(newLink) &&
-                    newLink.startsWith("http") &&
-                    new URL(this.url).origin === resolvedLink.origin)
-                    links.push(newLink);
-            });
+            if (cursor === 0) {
+                [...dom.window.document.querySelectorAll("a")]
+                    .forEach(anchor => {
+                    const href = anchor.href;
+                    const resolvedLink = new URL(href, link);
+                    resolvedLink.hash = "";
+                    const newLink = resolvedLink.href;
+                    if (!links.includes(newLink) &&
+                        newLink.startsWith("http"))
+                        links.push(newLink);
+                });
+            }
             const paragraphs = [
-                ...dom.window.document.querySelectorAll("p, ul")
+                ...dom.window.document.querySelectorAll("p, ul, ol, a")
             ].map(paragraph => paragraph.textContent.trim()).filter(paragraph => paragraph !== "");
+            paragraphs.unshift('source/link/cite/citation: ' + link + 'Information: ');
             contents.push(paragraphs);
             cursor++;
         }
         return contents;
     }
     async getContent() {
+        console.log(this.url);
         const response = await fetch(this.url);
         return await response.text();
     }
@@ -51,10 +52,12 @@ class Scrapper {
     async getParagraphs() {
         const dom = await this.getDOM();
         const paragraphs = [
-            ...dom.window.document.querySelectorAll("p, ul")
+            ...dom.window.document.querySelectorAll("p, ul, ol, a")
         ].map(paragraph => paragraph.textContent.trim()).filter(p => p !== "");
         return paragraphs;
     }
 }
 exports.Scrapper = Scrapper;
+// Checks either the URL is from the same website: line no 34
+//  && new URL(this.url).origin === resolvedLink.origin
 //# sourceMappingURL=scrapper.js.map

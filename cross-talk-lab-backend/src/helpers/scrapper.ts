@@ -5,39 +5,38 @@ export class Scrapper {
         public url: string
     ) { }
 
-    private normalizeUrl(url: string) {
-        return url[url.length - 1] === "/" ? url : url + "/";
-    }
-
     public async getParagraphsRecursively() {
         const links: string[] = [
-            this.normalizeUrl(this.url)
+            this.url
         ];
         const contents: string[][] = [];
         let cursor: number = 0;
-
         while (cursor < links.length) {
             const link = links[cursor];
+            console.log("Fetching " + link);
             const response = await fetch(link);
             const content = await response.text();
             const dom = new JSDOM(content);
 
-            [...dom.window.document.getElementsByTagName("a")]
+            if(cursor === 0){
+                [...dom.window.document.querySelectorAll("a")]
                 .forEach(anchor => {
                     const href = anchor.href;
                     const resolvedLink = new URL(href, link);
                     resolvedLink.hash = "";
-                    const newLink = this.normalizeUrl(resolvedLink.href);
+                    const newLink = resolvedLink.href;
                     if (
                         !links.includes(newLink) &&
-                        newLink.startsWith("http") &&
-                        new URL(this.url).origin === resolvedLink.origin
+                        newLink.startsWith("http") 
                     ) links.push(newLink);
                 });
+            }
 
             const paragraphs = [
-                ...dom.window.document.querySelectorAll("p, ul")
+                ...dom.window.document.querySelectorAll("p, ul, ol, a")
             ].map(paragraph => paragraph.textContent.trim()).filter(paragraph => paragraph !== "");
+            
+            paragraphs.unshift('source/link/cite/citation: ' + link + 'Information: ');
 
             contents.push(paragraphs);
             cursor++;
@@ -47,6 +46,7 @@ export class Scrapper {
     }
 
     public async getContent() {
+        console.log(this.url);
         const response = await fetch(this.url);
         return await response.text();
     }
@@ -59,8 +59,11 @@ export class Scrapper {
     public async getParagraphs() {
         const dom = await this.getDOM();
         const paragraphs = [
-            ...dom.window.document.querySelectorAll("p, ul")
+            ...dom.window.document.querySelectorAll("p, ul, ol, a")
         ].map(paragraph => paragraph.textContent.trim()).filter(p => p !== "");
         return paragraphs;
     }
 }
+
+// Checks either the URL is from the same website: line no 34
+//  && new URL(this.url).origin === resolvedLink.origin
