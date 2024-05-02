@@ -3,37 +3,67 @@ import { Layout } from "../Components/Layout";
 import { backendRequest } from "../Helpers/backendRequest";
 import { Input } from "../Components/Input";
 import { Button } from "../Components/Button";
+import { toast } from 'react-hot-toast';
 
 export function Scrape() {
 
     const [status, setStatus] = useState("");
     const [status2, setStatus2] = useState("");
+    const [loading, setLoading] = useState(false);
 
     async function scrape(e) {
         e.preventDefault();
+        setLoading(true);
         setStatus("Loading...");
 
         const body = new FormData(e.target)
+        let formValues = {}
+        for (let [name, value] of body.entries()) {
+            formValues[name] = value;
+        }
+        if(formValues.name === '' || formValues.url === ''){
+                setLoading(false);6
+                setStatus("");
+                toast.error('Please Provide details');
+                return;
+        }
         const response = await backendRequest("post", "/scrape", body);
-
-        if (response.success)
+        if (response.success){
             setStatus("Scrapped and saved in vector database.");
-        else
+            setLoading(false);
+        }
+        else{
             setStatus("There was an Error");
+            setLoading(false);
+        }
     }
 
     async function uploadFile(e) {
         e.preventDefault();
+        setLoading(true);
         setStatus2("Loading...");
 
         const body = new FormData(e.target);
         body.append('name', body.get('filename'));
         const response = await backendRequest("post", "/save-file", body, true);
-
-        if (response.success)
+        let formValues = {}
+        for (let [name, value] of body.entries()) {
+            formValues[name] = value;
+        }
+        if(formValues.filename === '' || formValues.file === ''){
+                setLoading(false);6
+                setStatus("");
+                toast.error('Please Provide details');
+                return;
+        }
+        if (response.success){
             setStatus2("File is saved in vector database.");
-        else
+            setLoading(false);
+        }
+        else{
             setStatus2("There was an Error");
+            setLoading(false);
+        }
     }
 
     return (
@@ -60,7 +90,7 @@ export function Scrape() {
                         <label htmlFor="followLinks">Follow Links</label>
                     </div>
 
-                    <Button>Scrape</Button>
+                    <Button disabled={loading}>{loading ? "Loading..." : "Scrape"}</Button>
 
                     <p className="my-6">{status}</p>
                 </form>
@@ -82,7 +112,7 @@ export function Scrape() {
                         name="file"
                         accept=".txt,.docx,.pdf,.bmp,.jpg,.png,.pbm,.webp" />
 
-                    <Button>Get Content</Button>
+                    <Button disabled={loading}>{loading ? "Loading..." : "Get Content"}</Button>
 
                     <p className="my-6">{status2}</p>
                 </form>

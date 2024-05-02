@@ -15,6 +15,7 @@ import { NewChat } from './Pages/NewChat.jsx';
 import { Settings } from './Pages/Settings.jsx';
 import { Login } from './Pages/Login.jsx';
 import { Authenticated } from './Components/Authenticated.jsx';
+import Logs from './Pages/Logs.jsx';
 
 const router = createBrowserRouter([
   {
@@ -57,6 +58,14 @@ const router = createBrowserRouter([
         <NewChat />
       </Authenticated>
     ),
+  },
+  {
+    path: "logs",
+    element: (
+      <Authenticated>
+        <Logs/>
+      </Authenticated>
+    )
   },
   {
     path: "settings",

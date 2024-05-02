@@ -5,14 +5,16 @@ import { Message } from "./message";
 import { Setting } from "./setting";
 import { User } from "./user";
 import { Session } from "./session";
+import { ErrorLogs } from "./error-log";
 
 export const AppDataSource = new DataSource({
     type: "sqlite",
     database: "data.db",
-    entities: [ScrapeHistory, Chat, Message, Setting, User, Session],
+    entities: [ScrapeHistory, Chat, Message, Setting, User, Session, ErrorLogs],
     synchronize: true,
 });
 
+export const errorLogsRepository = AppDataSource.getRepository(ErrorLogs);
 export const scrapeHistoryRepository = AppDataSource.getRepository(ScrapeHistory);
 export const chatRepository = AppDataSource.getRepository(Chat);
 export const messageRepository = AppDataSource.getRepository(Message);

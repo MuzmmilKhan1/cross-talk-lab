@@ -14,7 +14,7 @@ export class Chainer {
 
     public async answerQuestion(question: string, vectorStores: VectorStore[], messageHistory: GPTMessage[], chatbotRole: string) {
         let messages: GPTMessage[] = [
-            [ "system", chatbotRole ],
+            ["system", chatbotRole],
             ...messageHistory,
             // [
             //     "system",
@@ -34,9 +34,11 @@ export class Chainer {
                 const contexts = await Promise.all(
                     retrievers.map(retriever => retriever.invoke(input))
                 );
-                return retrivedContext = contexts
+                retrivedContext = contexts
                     .map(res => res.map(sing => sing.pageContent).join("\n"))
                     .join("\n\n");
+                console.log(retrivedContext)
+                return retrivedContext;
             },
         }).withConfig({ runName: "contextRetriever" });
 

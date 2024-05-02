@@ -1,0 +1,1 @@
+{"version":3,"file":"logs-controller.js","sourceRoot":"","sources":["../../src/controller/logs-controller.ts"],"names":[],"mappings":";;;AACA,6DAA+D;AAG/D,MAAa,cAAc;IAChB,KAAK,CAAC,KAAK,CAAC,GAAY,EAAE,GAAa;QAC1C,MAAM,UAAU,GAAG,MAAM,oCAAmB,CAAC,IAAI,EAAE,CAAC;QACpD,GAAG,CAAC,IAAI,CAAC,UAAU,CAAC,CAAC;IACzB,CAAC;CACJ;AALD,wCAKC"}

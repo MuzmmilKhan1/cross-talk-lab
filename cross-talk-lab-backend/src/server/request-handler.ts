@@ -9,6 +9,7 @@ import { UploadController } from "../controller/upload-controller";
 import { SettingsController } from "../controller/settings-controller";
 import { AuthenticationController } from "../controller/authentication-controller";
 import { checkLoggedIn } from "../helpers/check-loggedin";
+import { LogsController } from "../controller/logs-controller";
 
 export class RequestHandler extends Server {
 
@@ -32,6 +33,9 @@ export class RequestHandler extends Server {
         const scrapeController = new ScrapeController();
         router.post("/scrape", scrapeController.scrape.bind(scrapeController));
         router.get("/scrape-history", scrapeController.scrapeHistory.bind(scrapeController));
+
+        const logsController = new LogsController();
+        router.get('/error-logs', logsController.index.bind(logsController));
 
         const chatController = new ChatController();
         router.get("/chats", chatController.index.bind(chatController));

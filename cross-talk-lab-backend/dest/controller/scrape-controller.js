@@ -13,9 +13,9 @@ class ScrapeController {
             const scrapper = new scrapper_1.Scrapper(url);
             let paragraphs = [];
             if (followLinks === "on")
-                paragraphs = (await scrapper.getParagraphsRecursively()).flat();
+                paragraphs = (await scrapper.getParagraphsRecursively(name)).flat();
             else
-                paragraphs = await scrapper.getParagraphs();
+                paragraphs = await scrapper.getParagraphs(name);
             const id = (0, uuid_1.v4)();
             const path = `vector-database/${id}`;
             await vector_data_1.VectorData.make(paragraphs, path);

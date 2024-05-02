@@ -1,0 +1,1 @@
+{"version":3,"file":"error-logs.js","sourceRoot":"","sources":["../../src/controller/error-logs.ts"],"names":[],"mappings":";;;AACA,6DAA+D;AAG/D,MAAa,gBAAgB;IAClB,KAAK,CAAC,KAAK,CAAC,GAAY,EAAE,GAAa;QAC1C,MAAM,UAAU,GAAG,oCAAmB,CAAC,IAAI,EAAE,CAAC;QAC9C,GAAG,CAAC,IAAI,CAAC,UAAU,CAAC,CAAC;IACzB,CAAC;CACJ;AALD,4CAKC"}

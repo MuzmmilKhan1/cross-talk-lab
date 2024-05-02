@@ -15,6 +15,7 @@ const upload_controller_1 = require("../controller/upload-controller");
 const settings_controller_1 = require("../controller/settings-controller");
 const authentication_controller_1 = require("../controller/authentication-controller");
 const check_loggedin_1 = require("../helpers/check-loggedin");
+const logs_controller_1 = require("../controller/logs-controller");
 class RequestHandler extends server_1.Server {
     constructor() {
         super();
@@ -32,6 +33,8 @@ class RequestHandler extends server_1.Server {
         const scrapeController = new scrape_controller_1.ScrapeController();
         router.post("/scrape", scrapeController.scrape.bind(scrapeController));
         router.get("/scrape-history", scrapeController.scrapeHistory.bind(scrapeController));
+        const logsController = new logs_controller_1.LogsController();
+        router.get('/error-logs', logsController.index.bind(logsController));
         const chatController = new chat_controller_1.ChatController();
         router.get("/chats", chatController.index.bind(chatController));
         router.get("/chats/:id", chatController.read.bind(chatController));

@@ -6,11 +6,17 @@ import { useState } from "react";
 
 export function Login() {
     const [invalid, setInvalid] = useState(false);
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     async function login(e) {
         e.preventDefault();
+        setLoading(true)
         const credentials = new FormData(e.target);
+        if(e.target.email || e.target.password){
+            console.log('Please fill the Information')
+            return;
+        }
         const response = await backendRequest("POST", "/login", credentials);
         if (response.success) navigate("/");
         else setInvalid(true);
@@ -28,7 +34,7 @@ export function Login() {
                 <Input className="mb-3" label="Password" name="password" type="password" autoComplete="current-password" />
 
                 <div className="text-end">
-                    <Button>Login</Button>
+                    <Button disabled={loading}>{loading ? "Loading..." : "Login"}</Button>
                 </div>
             </div>
 

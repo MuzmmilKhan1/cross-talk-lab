@@ -25,9 +25,11 @@ class Chainer {
         const contextRetrieval = new runnables_1.RunnableLambda({
             func: async (input) => {
                 const contexts = await Promise.all(retrievers.map(retriever => retriever.invoke(input)));
-                return retrivedContext = contexts
+                retrivedContext = contexts
                     .map(res => res.map(sing => sing.pageContent).join("\n"))
                     .join("\n\n");
+                console.log(retrivedContext);
+                return retrivedContext;
             },
         }).withConfig({ runName: "contextRetriever" });
         const setupAndRetrieval = runnables_1.RunnableMap.from({

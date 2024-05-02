@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sessionRepository = exports.userRepository = exports.settingRepository = exports.messageRepository = exports.chatRepository = exports.scrapeHistoryRepository = exports.AppDataSource = void 0;
+exports.sessionRepository = exports.userRepository = exports.settingRepository = exports.messageRepository = exports.chatRepository = exports.scrapeHistoryRepository = exports.errorLogsRepository = exports.AppDataSource = void 0;
 const typeorm_1 = require("typeorm");
 const scrape_history_1 = require("./scrape-history");
 const chat_1 = require("./chat");
@@ -8,12 +8,14 @@ const message_1 = require("./message");
 const setting_1 = require("./setting");
 const user_1 = require("./user");
 const session_1 = require("./session");
+const error_log_1 = require("./error-log");
 exports.AppDataSource = new typeorm_1.DataSource({
     type: "sqlite",
     database: "data.db",
-    entities: [scrape_history_1.ScrapeHistory, chat_1.Chat, message_1.Message, setting_1.Setting, user_1.User, session_1.Session],
+    entities: [scrape_history_1.ScrapeHistory, chat_1.Chat, message_1.Message, setting_1.Setting, user_1.User, session_1.Session, error_log_1.ErrorLogs],
     synchronize: true,
 });
+exports.errorLogsRepository = exports.AppDataSource.getRepository(error_log_1.ErrorLogs);
 exports.scrapeHistoryRepository = exports.AppDataSource.getRepository(scrape_history_1.ScrapeHistory);
 exports.chatRepository = exports.AppDataSource.getRepository(chat_1.Chat);
 exports.messageRepository = exports.AppDataSource.getRepository(message_1.Message);

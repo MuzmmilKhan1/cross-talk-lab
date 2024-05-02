@@ -21,9 +21,9 @@ export class ScrapeController {
             let paragraphs: string[] = [];
             
             if (followLinks === "on")
-                paragraphs = (await scrapper.getParagraphsRecursively()).flat()
+                paragraphs = (await scrapper.getParagraphsRecursively(name)).flat()
             else
-                paragraphs = await scrapper.getParagraphs();
+                paragraphs = await scrapper.getParagraphs(name);
 
             const id = uuid();
             const path = `vector-database/${id}`;
